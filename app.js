@@ -27,7 +27,7 @@ mongoose
 decoderMiddleWare = (req, res, next) => {
   let encodedData = req.query.data;
 
-  // console.log(encodedData);
+   console.log(encodedData);
   try {
     req.query.encodedData = encodedData;
     decodedData = JSON.parse(atob(encodedData));
@@ -165,4 +165,4 @@ app.get("/listVendor", decoderMiddleWare, VendorListMiddlewre, (req, res) => {
     return;
   }
 });
-app.listen(3000);
+app.listen(8080);
