@@ -22,16 +22,22 @@ mongoose
   )
   .then(() => {
     console.log("connected!!");
-  });
+  })
+  .catch(console.log);
 decoderMiddleWare = (req, res, next) => {
   let encodedData = req.query.data;
 
   // console.log(encodedData);
-  req.query.encodedData = encodedData;
-  decodedData = JSON.parse(atob(encodedData));
-  req.query.data = decodedData;
+  try {
+    req.query.encodedData = encodedData;
+    decodedData = JSON.parse(atob(encodedData));
+    req.query.data = decodedData;
 
-  next();
+    next();
+  } catch (exception) {
+    res.status(500);
+    res.json({ error: true, data: "Internal server error" });
+  }
 };
 VendorListMiddlewre = (req, res, next) => {
   const lat = req.query.data.lat;
@@ -131,6 +137,7 @@ app.get("/listVendor", decoderMiddleWare, VendorListMiddlewre, (req, res) => {
             $geometry: { type: "Point", coordinates: [lat, long] },
           },
         },
+        "address.city": city,
       })
       .then((centers) => {
         res.status(200);
