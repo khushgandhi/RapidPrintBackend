@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     git \
     curl \
-    supervisor
+    supervisor 
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
