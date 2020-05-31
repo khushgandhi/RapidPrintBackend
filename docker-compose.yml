@@ -1,0 +1,39 @@
+version : '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: app.dockerfile      
+    container_name: rapidPrintBackend
+    ports:
+      - 8080:8080   
+    volumes:
+      - .:/var/www
+      - node_modules:/var/www/node_modules
+    networks:
+      - app-network
+    links:
+     - redis
+  redis:
+    image: redis
+    container_name: radis
+    hostname: redis  
+    volumes:
+      - redis-data:/var/www
+      - ./:/var/www
+    networks:
+      - app-network
+    ports:
+      - "6379:6379"
+    entrypoint: redis-server --appendonly yes
+    restart: always
+
+volumes:
+  # Named volume
+  redis-data: 
+    driver: local
+  node_modules:
+
+networks:
+  app-network:
+    driver: bridge
