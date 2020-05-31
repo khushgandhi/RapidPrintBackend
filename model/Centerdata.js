@@ -21,10 +21,10 @@ var centerDataSchema = mongoose.Schema({
   },
   price: { type: Object, required: true },
   center_status: { type: Number, required: true },
-//   location: {
-//     type: { type: String },
-//     coordinates: [],
-//   },
+  location: {
+    type: { type: String },
+    coordinates: [],
+  },
 });
 //centerDataSchema.index({ location: "2dsphere" });
 module.exports = mongoose.model(
