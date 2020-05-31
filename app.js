@@ -43,4 +43,4 @@ decoderMiddleWare = (req, res, next) => {
 };
 app.use("/listVendor", decoderMiddleWare, vendorRoutes);
 
-app.listen(3000);
+app.listen(8080);
