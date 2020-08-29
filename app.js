@@ -28,12 +28,12 @@ mongoose
 decoderMiddleWare = (req, res, next) => {
   let encodedData = req.query.data;
 
-  //console.log(encodedData);
+ 
   try {
     req.query.encodedData = encodedData;
     decodedData = JSON.parse(atob(encodedData));
     req.query.data = decodedData;
-
+    
     next();
   } catch (exception) {
     console.log(exception);
@@ -42,5 +42,4 @@ decoderMiddleWare = (req, res, next) => {
   }
 };
 app.use("/listVendor", decoderMiddleWare, vendorRoutes);
-
 app.listen(8080);

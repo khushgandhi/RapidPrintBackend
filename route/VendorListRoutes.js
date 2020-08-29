@@ -9,11 +9,15 @@ const singleColored = "one_side_color_page";
 const singlePlain = "one_side_plain_page";
 const doubleColored = "double_side_color_page";
 const doublePlain = "double_side_plain_page";
+convertToIgnoreCase = (val) => {
+  return new RegExp(["^", val, "$"].join(""), "i");
+};
+
 router.get(
   "/sortBy/singleSidedPlain",
   VendorCacheMiddleware.sortedBySingleSidedPlainMiddleware,
   (req, res, next) => {
-    const city = req.query.data.city;
+    const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
     const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
     const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
@@ -27,6 +31,7 @@ router.get(
         .then((centers) => {
           res.status(200);
           let temp_centers = centers.map((val) => JSON.stringify(val));
+          console.log(temp_centers);
           let transaction = redisClient.multi();
           for (let i = 0; i < temp_centers.length; i++) {
             transaction.rpush(
@@ -59,7 +64,7 @@ router.get(
   "/sortBy/doubleSidedColor",
   VendorCacheMiddleware.sortedByDoubleSidedColorMiddleware,
   (req, res, next) => {
-    const city = req.query.data.city;
+    const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
     const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
     const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
@@ -105,12 +110,11 @@ router.get(
   "/sortBy/singleSidedColor",
   VendorCacheMiddleware.sortedBySingleSidedColorMiddleware,
   (req, res, next) => {
-    const city = req.query.data.city;
+    const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
     const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
     const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
     const direction = req.query.direction ? req.query.direction : 1;
-    //console.log("city--->" + req.query.city);
     try {
       centerData
         .find({
@@ -152,7 +156,7 @@ router.get(
   "/sortBy/doubleSidedPlain",
   VendorCacheMiddleware.sortedByDoubleSidedPlainMiddleware,
   (req, res, next) => {
-    const city = req.query.data.city;
+    const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
     const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
     const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
@@ -196,16 +200,17 @@ router.get(
 );
 router.get(
   "/sortBy/location",
-  VendorCacheMiddleware.VendorListByLocationMiddlewre,
+  VendorCacheMiddleware.VendorListByLocationMiddleware,
   (req, res, next) => {
     const lat = req.query.data.lat;
     const long = req.query.data.long;
-    const city = req.query.data.city;
+    const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
     const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
     const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
 
     if ((!lat || !long) && city) {
+      console.log("without location..");
       try {
         centerData.find({ "address.city": city }).then((centers) => {
           res.status(200);
@@ -232,6 +237,7 @@ router.get(
       }
     } else if (lat && long && city) {
       try {
+        console.log("with location...");
         centerData
           .find({
             location: {
@@ -271,4 +277,60 @@ router.get(
     }
   }
 );
+router.get(
+  "/vendorNames",
+  VendorCacheMiddleware.VendorNameMiddleware,
+  (req, res, next) => {
+    const city = convertToIgnoreCase(req.query.data.city);
+    const encodedData = req.query.encodedData;
+
+    try {
+      centerData
+        .aggregate([
+          { $match: { "address.city": city } },
+          { $project: { name: 1, _id: 0 } },
+        ])
+        .then((vendorNames) => {
+          res.status(200);
+          let temp_names = vendorNames.map((val) => val.name);
+          let transaction = redisClient.multi();
+          for (let i = 0; i < temp_names.length; i++) {
+            transaction.rpush(encodedData + "_" + "names", temp_names[i]);
+          }
+          transaction.expire(encodedData + "_" + "names", 10 * 60);
+          transaction.exec((err, reply) => {
+            console.log("added-->" + reply + " to " + encodedData);
+          });
+          res.json({
+            error: false,
+            data: temp_names,
+          });
+        });
+    } catch (exception) {
+      res.status(500);
+      res.json({ error: true, data: "Internal server error" });
+    }
+  }
+);
+router.get("/byName", (req, res, next) => {
+  const city = convertToIgnoreCase(req.query.data.city);
+  const vendorName = req.query.vendorName;
+  const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
+  const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
+  try {
+    //console.log(city);
+    centerData
+      .find({ "address.city": city, name: vendorName })
+      .then((centers) => {
+        res.status(200);
+        res.json({
+          error: false,
+          data: centers.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize),
+        });
+      });
+  } catch (exception) {
+    res.status(500);
+    res.json({ error: true, data: "Internal server error" });
+  }
+});
 module.exports = router;

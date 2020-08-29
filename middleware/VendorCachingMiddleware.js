@@ -135,7 +135,7 @@ sortedByDoubleSidedColorMiddleware = (req, res, next) => {
     }
   );
 };
-VendorListByLocationMiddlewre = (req, res, next) => {
+VendorListByLocationMiddleware = (req, res, next) => {
   const lat = req.query.data.lat;
   const long = req.query.data.long;
   const city = req.query.data.city;
@@ -162,10 +162,34 @@ VendorListByLocationMiddlewre = (req, res, next) => {
           res.json({ error: false, data: temp_centers, cached: true });
         }
       );
-      
+
       return;
     }
 
+    next();
+  });
+};
+VendorNameMiddleware = (req, res, next) => {
+  const encodedData = req.query.encodedData;
+  redisClient.exists(encodedData + "_" + "names", (err, reply) => {
+    if (reply == 1) {
+      redisClient.lrange(
+        encodedData + "_" + "names",
+        0,
+        -1,
+        (err, vendorNames) => {
+          if (err) {
+            res.status(500);
+            console.log("error....");
+            res.json({ error: true, data: "Internal server error" });
+            return;
+          }
+          res.status(200);
+          res.json({ error: false, data: vendorNames, cached: true });
+        }
+      );
+      return;
+    }
     next();
   });
 };
@@ -174,5 +198,6 @@ module.exports = {
   sortedBySingleSidedColorMiddleware,
   sortedByDoubleSidedPlainMiddleware,
   sortedByDoubleSidedColorMiddleware,
-  VendorListByLocationMiddlewre,
+  VendorListByLocationMiddleware,
+  VendorNameMiddleware,
 };
