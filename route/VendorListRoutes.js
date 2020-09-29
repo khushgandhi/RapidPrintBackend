@@ -52,6 +52,7 @@ router.get(
               pageIndex * pageSize,
               (pageIndex + 1) * pageSize
             ),
+            length:centers.length
           });
         });
     } catch (error) {
@@ -97,7 +98,7 @@ router.get(
             data: centers.slice(
               pageIndex * pageSize,
               (pageIndex + 1) * pageSize
-            ),
+            ),length:centers.length
           });
         });
     } catch (error) {
@@ -144,6 +145,7 @@ router.get(
               pageIndex * pageSize,
               (pageIndex + 1) * pageSize
             ),
+            length:centers.length
           });
         });
     } catch (error) {
@@ -190,6 +192,7 @@ router.get(
               pageIndex * pageSize,
               (pageIndex + 1) * pageSize
             ),
+            length:centers.length
           });
         });
     } catch (error) {
@@ -229,6 +232,7 @@ router.get(
               pageIndex * pageSize,
               (pageIndex + 1) * pageSize
             ),
+            length:centers.length
           });
         });
       } catch (error) {
@@ -264,6 +268,7 @@ router.get(
                 pageIndex * pageSize,
                 (pageIndex + 1) * pageSize
               ),
+              length:centers.length
             });
           });
       } catch (error) {
@@ -318,7 +323,7 @@ router.get("/byName", (req, res, next) => {
   const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
   const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
   try {
-    //console.log(city);
+    
     centerData
       .find({ "address.city": city, name: vendorName })
       .then((centers) => {
@@ -326,6 +331,7 @@ router.get("/byName", (req, res, next) => {
         res.json({
           error: false,
           data: centers.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize),
+          length:centers.length
         });
       });
   } catch (exception) {
