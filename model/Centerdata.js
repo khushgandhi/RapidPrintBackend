@@ -25,6 +25,7 @@ var centerDataSchema = mongoose.Schema({
     type: { type: String },
     coordinates: [],
   },
+  addons:[]
 });
 //centerDataSchema.index({ location: "2dsphere" });
 module.exports = mongoose.model(
