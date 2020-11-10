@@ -19,8 +19,6 @@ router.get(
   (req, res, next) => {
     const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
-    const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
-    const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
     const direction = req.query.direction ? req.query.direction : 1;
     try {
       centerData
@@ -48,10 +46,7 @@ router.get(
           });
           res.json({
             error: false,
-            data: centers.slice(
-              pageIndex * pageSize,
-              (pageIndex + 1) * pageSize
-            ),
+            data: centers,
             length:centers.length
           });
         });
@@ -67,8 +62,6 @@ router.get(
   (req, res, next) => {
     const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
-    const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
-    const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
     const direction = req.query.direction ? req.query.direction : 1;
     try {
       centerData
@@ -95,10 +88,8 @@ router.get(
           });
           res.json({
             error: false,
-            data: centers.slice(
-              pageIndex * pageSize,
-              (pageIndex + 1) * pageSize
-            ),length:centers.length
+            data: centers,
+            length:centers.length
           });
         });
     } catch (error) {
@@ -113,8 +104,6 @@ router.get(
   (req, res, next) => {
     const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
-    const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
-    const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
     const direction = req.query.direction ? req.query.direction : 1;
     try {
       centerData
@@ -141,10 +130,7 @@ router.get(
           });
           res.json({
             error: false,
-            data: centers.slice(
-              pageIndex * pageSize,
-              (pageIndex + 1) * pageSize
-            ),
+            data: centers,
             length:centers.length
           });
         });
@@ -160,8 +146,6 @@ router.get(
   (req, res, next) => {
     const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
-    const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
-    const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
     const direction = req.query.direction ? req.query.direction : 1;
     try {
       centerData
@@ -188,10 +172,7 @@ router.get(
           });
           res.json({
             error: false,
-            data: centers.slice(
-              pageIndex * pageSize,
-              (pageIndex + 1) * pageSize
-            ),
+            data: centers,
             length:centers.length
           });
         });
@@ -209,8 +190,6 @@ router.get(
     const long = req.query.data.long;
     const city = convertToIgnoreCase(req.query.data.city);
     const encodedData = req.query.encodedData;
-    const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
-    const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
 
     if ((!lat || !long) && city) {
       console.log("without location..");
@@ -228,10 +207,7 @@ router.get(
           });
           res.json({
             error: false,
-            data: centers.slice(
-              pageIndex * pageSize,
-              (pageIndex + 1) * pageSize
-            ),
+            data: centers,
             length:centers.length
           });
         });
@@ -264,10 +240,7 @@ router.get(
             });
             res.json({
               error: false,
-              data: centers.slice(
-                pageIndex * pageSize,
-                (pageIndex + 1) * pageSize
-              ),
+              data: centers,
               length:centers.length
             });
           });
@@ -320,8 +293,6 @@ router.get(
 router.get("/byName", (req, res, next) => {
   const city = convertToIgnoreCase(req.query.data.city);
   const vendorName = req.query.vendorName;
-  const pageSize = req.query.pageSize ? +req.query.pageSize : 5;
-  const pageIndex = req.query.pageIndex ? +req.query.pageIndex : 0;
   try {
     
     centerData
@@ -330,7 +301,7 @@ router.get("/byName", (req, res, next) => {
         res.status(200);
         res.json({
           error: false,
-          data: centers.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize),
+          data: centers,
           length:centers.length
         });
       });
